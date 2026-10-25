@@ -8,9 +8,11 @@ It works on its own, and is best paired with
 [TerrainPrecisionFix](https://github.com/lhervier/KSP-Fix-TerrainPrecision): see
 [Works best with TerrainPrecisionFix](#works-best-with-terrainprecisionfix).
 
-EVA Construction Mode has other stock bugs, which this mod does not fix (yet): parts that come back
-slightly moved or turned after a reload, and parts that pass through the ground after a change of tool.
-They are listed, with the test planned for each, in [Work in progress](#work-in-progress).
+EVA Construction Mode has other stock bugs, which this mod does not fix. Parts that pass through the ground
+after a change of tool are fixed by [Construction Collider Fix](https://github.com/lhervier/KSP-Fix-ConstructionCollider): see
+[Parts that pass through the ground after a change of tool](#parts-that-pass-through-the-ground-after-a-change-of-tool).
+Parts that come back slightly moved or turned after a reload, and a few smaller defects, are listed with the test
+planned for each in [Work in progress](#work-in-progress).
 
 ## The problem
 
@@ -113,15 +115,22 @@ TerrainPrecisionFix loads an anchored base where it was saved.
 Earlier versions of this mod kept anchored bases in place themselves, with a *Keep anchored bases in
 place* setting. That job is now TerrainPrecisionFix's, and the setting is gone.
 
+## Parts that pass through the ground after a change of tool
+
+A part placed against the ground (the "legs" of a girder structure) can pass through it as soon as the structure
+presses on it, until the game is saved and reloaded. It happens to a part selected with the Rotate tool, then moved
+with the Move tool without being deselected in between, or the other way round: switching tools records its
+colliders while they are triggers, and the part is released as a trigger, colliding with nothing. This mod is not
+involved: it stops the part at the ground whether its colliders are triggers or not.
+
+[Construction Collider Fix](https://github.com/lhervier/KSP-Fix-ConstructionCollider) fixes it, and shows it on a stand whose leg is switched between
+tools: without that fix, the stand falls over the leg; with it, the leg holds.
+
 ## Work in progress
 
-Players report two more problems with EVA Construction Mode, and they have nothing to do with the
-ground being uneven or moving:
-
-- a part moved or rotated by an engineer comes back **slightly moved or slightly turned** after a
-  reload;
-- a part placed against the ground (the "legs" of a girder structure) **does not hold on the ground**: it
-  passes through it as soon as the structure presses on it, until the game is saved and reloaded.
+Players report one more problem with EVA Construction Mode, and it has nothing to do with the ground being
+uneven or moving: a part moved or rotated by an engineer comes back **slightly moved or slightly turned** after
+a reload.
 
 Reading the game's code for EVA Construction Mode (KSP 1.12) points to the stock bugs below. **None of
 them has been measured in game yet**: each one is a suspicion, given with the test that should confirm or
@@ -129,36 +138,7 @@ rule it out. This mod does not fix any of them today. All tests are played in a 
 first **without this mod**, since they are about stock behaviour, then with it, to check that it changes
 nothing.
 
-### 1. A part switched between the Rotate and Move tools passes through the ground
-
-**What the player sees.** A part is selected with the Rotate tool, then moved with the Move tool
-without being deselected in between, or the other way round. Once released, it no longer collides with
-anything outside its own vessel: legs placed this way let the structure sink into the ground. After a save
-and a reload, the part collides again.
-
-**What the code suggests.** While a part is being edited, its colliders are turned into triggers so that
-it can be moved through other parts. `EVAConstructionModeEditor.FetchColliders` records the current
-`isTrigger` of each collider as its "original" state, and `ToggleCollidersTrigger` puts that state back:
-
-```csharp
-// EVAConstructionModeEditor.ToggleCollidersTrigger (KSP 1.12)
-selectedPartColliders[i].collider.isTrigger = toggle | selectedPartColliders[i].isTrigger;
-```
-
-Turning on the Rotate or the Move gizmo calls `FetchColliders` and then turns the triggers on; turning a
-gizmo off only detaches it. Switching tools with the part still selected therefore records the colliders
-*while they are triggers*, and every later restore leaves them as triggers. A reload rebuilds the part,
-which clears it.
-
-**Test.**
-1. On a landed vessel, attach a girder close to the ground.
-2. Rotate tool: select the girder, rotate it a little.
-3. Move tool, **without deselecting**: move it down until it touches the ground.
-4. Back to the Place tool, then load the structure (attach a few more girders on top of it).
-5. Expected if the suspicion is right: the girder sinks through the ground. Control run: same steps, but
-   deselect the girder between steps 2 and 3; it should hold.
-
-### 2. An edited part comes back slightly moved or turned after a reload
+### 1. An edited part comes back slightly moved or turned after a reload
 
 **What the player sees.** A part attached, moved or rotated in EVA Construction Mode is, after a save and
 a reload, a little off from where it was left, relative to the part it is attached to. The longer and
@@ -190,7 +170,7 @@ that moment.
 3. *Attaching.* Attach a part at the far end of the same structure, save, reload: it should come back a
    little off its attach node.
 
-### 3. A released part drops slightly before its joint is created
+### 2. A released part drops slightly before its joint is created
 
 **What the player sees.** When a part is deselected after a move or rotation, it gives a small jerk
 downwards, and the position it ends up in is not the one saved.
@@ -202,7 +182,7 @@ part that is attached to nothing. The saved pose was taken before that fall.
 **Test.** Attach a heavy part at the end of a girder on a landed vessel, move it, deselect it, and watch for
 a small drop; then save, reload, and compare its position with the one before the save.
 
-### 4. Snapping in *Absolute* mode rounds against the world axes, not the vessel's
+### 3. Snapping in *Absolute* mode rounds against the world axes, not the vessel's
 
 **What the player sees.** With snapping on and the gizmo in *Absolute* mode, the part turns (up to half a
 snap step, on every axis, including the ones not being dragged) or shifts the moment a handle is
@@ -235,9 +215,8 @@ moves, the suspicion is confirmed. Control run: the same click in *Local* mode.
 
 ### What this mod could do about it
 
-The first two bugs could be worked around from here: restore the colliders before
-`FetchColliders` records them, and compute the edited part's stored pose from its parent's stored pose
-rather than from the live, bent structure. Nothing is decided until the tests above have been played.
+The first bug could be worked around from here: compute the edited part's stored pose from its parent's stored
+pose rather than from the live, bent structure. Nothing is decided until the tests above have been played.
 
 ## Settings
 
