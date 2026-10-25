@@ -78,8 +78,12 @@ This mod attacks the problem at the source: rather than repairing the vessel on 
 invalid placement impossible in the first place. Step 4 above simply cannot happen — the part refuses
 to go below the surface, so the reloaded structure is exactly the one that was built.
 
-While EVA Construction Mode is on, the mod watches every part being moved and **truncates** the
-requested move: the part travels up to the real ground contact, and stops there.
+While EVA Construction Mode is on, the mod watches every part being moved or rotated with the gizmos of
+the Move and Rotate tools and **truncates** the requested move: the part travels up to the real ground
+contact, and stops there. A kerbal stops it the same way.
+
+A part held from the Place tool is left to the game, which already refuses to drop or attach it while
+it touches the ground or a kerbal (it turns red).
 
 ## Technical details
 

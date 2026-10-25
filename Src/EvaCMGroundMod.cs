@@ -632,7 +632,20 @@ namespace com.github.lhervier.ksp.fix.evaconstructionmode {
         }
 
         private void OnEditorPartEvent(ConstructionEventType eventType, Part part) {
-            if( 
+            // Only the Move and Rotate gizmos are guarded. The part held from the Place tool is put back
+            // under the cursor by the game at every frame: a sweep from its previous pose stands for no
+            // real travel, and stopped it against the kerbal standing in between. The game already
+            // refuses to drop or attach a held part whose trigger colliders touch the ground or a kerbal.
+            if(
+                eventType != ConstructionEventType.PartOffsetting &&
+                eventType != ConstructionEventType.PartOffset &&
+                eventType != ConstructionEventType.PartRotating &&
+                eventType != ConstructionEventType.PartRotated
+            ) {
+                return;
+            }
+
+            if(
                 part == this.previousPart && 
                 part.transform.position == this.previousPosition && 
                 part.transform.rotation == this.previousRotation 
