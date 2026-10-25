@@ -1,4 +1,4 @@
-# EVA Construction Mode Ground Fix
+# Construction Ground Fix
 
 A Kerbal Space Program mod that stops an engineer in EVA Construction Mode from moving a part into
 the ground. Nothing in the game refuses it, and the damage only shows up on the next reload, when KSP
@@ -224,21 +224,29 @@ pose rather than from the live, bent structure. Nothing is decided until the tes
 
 ## Settings
 
-The mod adds a button to the application launcher (in flight and at the space center) that opens a
-small settings window with a single setting, the **log level**: how much the mod writes to `KSP.log`.
+`GameData\KSPFixConstructionGround\PluginData\settings.cfg` is read once, when KSP starts:
 
-It is a setting of the *installation*, not of a save: it is stored in
-`GameData/KSPFixEvaConstructionMode/PluginData/settings.cfg` and applied as soon as it is changed. Deleting that
-file restores the default.
+```
+// How much the mod writes to KSP.log: Error, Warning, Info or Debug.
+logLevel = Info
+```
 
-Earlier versions also had a *Ground offset* setting, to stop a part some distance above the ground.
-It is gone: a part now always stops right at the contact.
+At `Debug`, the mod writes a few lines for each move or rotation with the gizmos: what was asked, and where the
+ground stopped the part.
+
+Earlier versions had a settings window in the application launcher, and a *Ground offset* setting to stop a part
+some distance above the ground. Both are gone: a part now always stops right at the contact.
 
 ## Installation
 
 1. Download the latest release
 2. Extract the contents to your KSP GameData folder
 3. The fix activates when you enter EVA Construction Mode
+
+## Build
+
+Set `KSPDIR` to the folder of a KSP install, then run `build.bat`: it compiles
+`GameData\KSPFixConstructionGround\KSPFixConstructionGround.dll`. Installing is up to you.
 
 ## Requirements
 

@@ -1,17 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
-using com.github.lhervier.ksp.shared;
 
-namespace com.github.lhervier.ksp.fix.evaconstructionmode {
+namespace com.github.lhervier.ksp.fix.constructionground {
 
     /// <summary>
     /// The fix itself: while EVA construction mode is on, a part moved toward the ground stops where it
     /// touches it.
     /// </summary>
     [KSPAddon(KSPAddon.Startup.PSystemSpawn, false)]
-    public class EvaCMGroundMod : MonoBehaviour {
-
-        private static readonly ModLogger LOGGER = new ModLogger("GroundFix");
+    public class KSPFixConstructionGround : MonoBehaviour {
 
         /// <summary>
         /// Layer mask for the colliders that we want to check.
@@ -81,29 +78,28 @@ namespace com.github.lhervier.ksp.fix.evaconstructionmode {
 
         protected void Awake()
         {
-            LOGGER.LogInfo("Awaked");
+            Settings.Load();
+            Log.Info($"Version {typeof(KSPFixConstructionGround).Assembly.GetName().Version}, log level {Log.Level}");
             DontDestroyOnLoad(this);
         }
 
         public void Start() {
             GameEvents.OnEVAConstructionMode.Add(OnEVAConstructionMode);
-            LOGGER.LogInfo("Plugin started");
         }
 
         public void OnDestroy() {
             GameEvents.onEditorPartEvent.Remove(OnEditorPartEvent);
             GameEvents.OnEVAConstructionMode.Remove(OnEVAConstructionMode);
-            LOGGER.LogInfo("Plugin stopped");
         }
 
         public void OnEVAConstructionMode(bool mode) {
-            LOGGER.LogDebug($"OnEVAConstructionMode: {mode}");
+            Log.Debug($"OnEVAConstructionMode: {mode}");
             if( mode ) {
-                LOGGER.LogDebug("Starting Fix");
+                Log.Debug("Starting Fix");
                 GameEvents.onEditorPartEvent.Add(OnEditorPartEvent);
             }
             else {
-                LOGGER.LogDebug("Stopping Fix");
+                Log.Debug("Stopping Fix");
                 GameEvents.onEditorPartEvent.Remove(OnEditorPartEvent);
             }
         }
@@ -131,7 +127,7 @@ namespace com.github.lhervier.ksp.fix.evaconstructionmode {
             foreach (Collider otherCollider in potentialColliders) {
                 // Colliders for analyse arms are not considered as colliding
                 if( otherCollider.name == "rangeTrigger" && otherCollider.gameObject.layer == 15) {     // Local Scenery
-                    LOGGER.LogDebug($"Skipping rangeTrigger collider...");
+                    Log.Debug($"Skipping rangeTrigger collider...");
                     continue;
                 }
                 if (Physics.ComputePenetration(
@@ -154,28 +150,28 @@ namespace com.github.lhervier.ksp.fix.evaconstructionmode {
         }
 
         private void LogPenetratingColliders(Collider collider, Collider[] colliders) {
-            if( colliders.Length == 0 ) return;
+            if( colliders.Length == 0 || !Log.IsDebugEnabled ) return;
 
-            LOGGER.LogDebug($"Collider {collider.name}/{collider.GetType().Name} colliding with {colliders.Length} colliders");
+            Log.Debug($"Collider {collider.name}/{collider.GetType().Name} colliding with {colliders.Length} colliders");
             foreach (Collider coll in colliders) {
-                LOGGER.LogDebug($"- {coll.name} on layer {coll.gameObject.layer} ({LayerMask.LayerToName(coll.gameObject.layer)})");
+                Log.Debug($"- {coll.name} on layer {coll.gameObject.layer} ({LayerMask.LayerToName(coll.gameObject.layer)})");
             }
-            LOGGER.LogDebug($"");
-            LOGGER.LogDebug($"Collider game hierarchy :");
+            Log.Debug($"");
+            Log.Debug($"Collider game hierarchy :");
             {
                 Transform currentTransform = collider.transform.parent;
                 while (currentTransform != null) {
-                    LOGGER.LogDebug($"  Parent: {currentTransform.name} ({currentTransform.GetType().Name})");
+                    Log.Debug($"  Parent: {currentTransform.name} ({currentTransform.GetType().Name})");
                     currentTransform = currentTransform.parent;
                 }
             }
-            LOGGER.LogDebug($"");
-            LOGGER.LogDebug($"Colliding colliders hierarchy :");
+            Log.Debug($"");
+            Log.Debug($"Colliding colliders hierarchy :");
             foreach (Collider coll in colliders) {
-                LOGGER.LogDebug($"- Collider {coll.name}/{coll.GetType().Name} hierarchy :");
+                Log.Debug($"- Collider {coll.name}/{coll.GetType().Name} hierarchy :");
                 Transform currentTransform = coll.transform.parent;
                 while (currentTransform != null) {
-                    LOGGER.LogDebug($"  Parent: {currentTransform.name} ({currentTransform.GetType().Name})");
+                    Log.Debug($"  Parent: {currentTransform.name} ({currentTransform.GetType().Name})");
                     currentTransform = currentTransform.parent;
                 }
             }
@@ -196,7 +192,7 @@ namespace com.github.lhervier.ksp.fix.evaconstructionmode {
                 colliders = GetMeshColliders(meshCollider);
             }
             else {
-                LOGGER.LogError($"Unsupported collider type : {collider.GetType().Name} (position: {collider.transform.position})");
+                Log.Error($"Unsupported collider type : {collider.GetType().Name} (position: {collider.transform.position})");
                 colliders = new Collider[0];
             }
             LogPenetratingColliders(collider, colliders);
@@ -564,7 +560,7 @@ namespace com.github.lhervier.ksp.fix.evaconstructionmode {
                 window = Mathf.Max(window, 2f * GetProjectedExtent(collider.bounds, direction));
             }
             if (firstTouch >= distance) {
-                LOGGER.LogDebug("Nothing on the way, the move is granted whole");
+                Log.Debug("Nothing on the way, the move is granted whole");
                 return toPosition;
             }
 
@@ -615,7 +611,7 @@ namespace com.github.lhervier.ksp.fix.evaconstructionmode {
                 }
             }
 
-            LOGGER.LogDebug($"Ground reached {free:F3} m away, stopping there");
+            Log.Debug($"Ground reached {free:F3} m away, stopping there");
             return fromPosition + direction * free;
         }
 
@@ -654,7 +650,7 @@ namespace com.github.lhervier.ksp.fix.evaconstructionmode {
             }
 
             if( part != this.previousPart ) {
-                LOGGER.LogDebug(
+                Log.Debug(
                     $"Now following {part.partInfo.name}, from {part.transform.position.ToString("F3")}"
                 );
 
@@ -677,7 +673,7 @@ namespace com.github.lhervier.ksp.fix.evaconstructionmode {
             // in a single query whatever the distance, so crossing the ground stops being something the test
             // has to catch in time and becomes something the part cannot do: however long the player keeps
             // dragging, the part is only ever put down on the near side of what stands in its way.
-            LOGGER.LogDebug(
+            Log.Debug(
                 $"[{eventType}] {part.partInfo.name}: {Vector3.Distance(this.previousPosition, targetPosition):F3} m" +
                 $" and {Quaternion.Angle(this.previousRotation, targetRotation):F1} deg asked for"
             );
@@ -711,7 +707,7 @@ namespace com.github.lhervier.ksp.fix.evaconstructionmode {
             }
 
             if (inGround) {
-                LOGGER.LogDebug($"Rotation walked over {steps} pose(s) hits the ground, keeping the previous pose");
+                Log.Debug($"Rotation walked over {steps} pose(s) hits the ground, keeping the previous pose");
             }
 
             if( inGround ) {

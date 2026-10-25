@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>KSPFixConstructionGround</AssemblyName>
+    <RootNamespace>com.github.lhervier.ksp.fix.constructionground</RootNamespace>
+    <Version>1.0.0</Version>
+    <Description>Stops a part moved or rotated with the gizmos of EVA construction mode at the ground it touches</Description>
+    <!-- Straight into the folder that gets copied to the GameData of KSP. -->
+    <OutputPath>GameData\KSPFixConstructionGround</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Read from the KSP install given by KSPDIR, never copied next to the DLL. -->
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

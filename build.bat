@@ -1,7 +1,13 @@
 @echo off
-REM Thin wrapper: delegates to the shared generic build in KSP-Shared\tools.
+REM Compiles GameData\KSPFixConstructionGround\KSPFixConstructionGround.dll. Installing is up to you: copy the
+REM GameData\KSPFixConstructionGround folder into the GameData of KSP.
 setlocal
 cd /d "%~dp0"
-set "MOD_CSPROJ=KSPFixEvaConstructionMode.csproj"
-call "KSP-Shared\tools\build.bat"
+
+if not defined KSPDIR (
+    echo ERROR: KSPDIR is not set. Point it at your KSP install folder.
+    exit /b 1
+)
+
+dotnet build KSPFixConstructionGround.csproj -c Release -p:KSPDIR="%KSPDIR%"
 exit /b %errorlevel%
