@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace com.github.lhervier.ksp.fix.constructionground {
@@ -79,7 +80,9 @@ namespace com.github.lhervier.ksp.fix.constructionground {
         protected void Awake()
         {
             Settings.Load();
-            Log.Info($"Version {typeof(KSPFixConstructionGround).Assembly.GetName().Version}, log level {Log.Level}");
+            string version = typeof(KSPFixConstructionGround).Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+            Log.Info($"Version {version}, log level {Log.Level}");
             DontDestroyOnLoad(this);
         }
 
