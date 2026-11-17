@@ -3,7 +3,7 @@
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>KSPFixConstructionGround</AssemblyName>
     <RootNamespace>com.github.lhervier.ksp.fix.constructionground</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>1.0.1-dev</Version>
     <Description>Stops a part moved or rotated with the gizmos of EVA construction mode at the ground it touches</Description>
     <!-- Straight into the folder that gets copied to the GameData of KSP. -->
     <OutputPath>GameData\KSPFixConstructionGround</OutputPath>
