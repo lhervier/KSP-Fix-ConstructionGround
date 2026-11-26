@@ -107,7 +107,7 @@ then come back slightly buried or slightly above it, and a large base can be str
 physics frame. TerrainPrecisionFix rebuilds the ground at the very same height every time, so a part
 stays where it was placed.
 
-→ [Why the moving ground matters](https://github.com/lhervier/KSP-Fix-TerrainPrecision/blob/main/README.md#why-the-moving-ground-matters)
+→ [Why the moving ground matters](https://github.com/lhervier/KSP-Fix-TerrainPrecision/blob/main/docs/how-ksp-builds-the-ground/README.md#why-the-moving-ground-matters)
 
 **An anchored base is lifted at load.** KSP raises a vessel built on a ground anchor when it loads it,
 and the anchor, riveted to the ground, holds it there: the anchor's spikes come out of the ground, and
